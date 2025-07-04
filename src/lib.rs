@@ -40,7 +40,7 @@ impl CompactSize {
     }
 
     pub fn from_bytes(bytes: &[u8]) -> Result<(Self, usize), BitcoinError> {
- if bytes.is_empty() {
+        if bytes.is_empty() {
             return Err(BitcoinError::InsufficientBytes);
         }
 
@@ -65,14 +65,11 @@ impl CompactSize {
                     return Err(BitcoinError::InsufficientBytes);
                 }
                 let val = u64::from_le_bytes([
-                    bytes[1], bytes[2], bytes[3], bytes[4],
-                    bytes[5], bytes[6], bytes[7], bytes[8],
+                    bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7], bytes[8],
                 ]);
                 Ok((CompactSize::new(val), 9))
-            }
-            // _ => Err(BitcoinError::InvalidFormat),
+            } // _ => Err(BitcoinError::InvalidFormat),
         }
-    
     }
 }
 
@@ -119,7 +116,7 @@ impl OutPoint {
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
-           let mut v = self.txid.0.to_vec();
+        let mut v = self.txid.0.to_vec();
         v.extend_from_slice(&self.vout.to_le_bytes());
         v
     }
@@ -132,7 +129,6 @@ impl OutPoint {
         txid.copy_from_slice(&bytes[..32]);
         let vout = u32::from_le_bytes([bytes[32], bytes[33], bytes[34], bytes[35]]);
         Ok((OutPoint::new(txid, vout), 36))
-    
     }
 }
 
@@ -195,7 +191,7 @@ impl TransactionInput {
 
     pub fn from_bytes(bytes: &[u8]) -> Result<(Self, usize), BitcoinError> {
         // TODO: Deserialize in order:
-                let (outpoint, used1) = OutPoint::from_bytes(bytes)?;
+        let (outpoint, used1) = OutPoint::from_bytes(bytes)?;
         let (script, used2) = Script::from_bytes(&bytes[used1..])?;
         if bytes.len() < used1 + used2 + 4 {
             return Err(BitcoinError::InsufficientBytes);
@@ -261,7 +257,10 @@ impl BitcoinTransaction {
             bytes[cursor + 2],
             bytes[cursor + 3],
         ]);
-        Ok((BitcoinTransaction::new(version, inputs, lock_time), cursor + 4))
+        Ok((
+            BitcoinTransaction::new(version, inputs, lock_time),
+            cursor + 4,
+        ))
     }
 }
 
